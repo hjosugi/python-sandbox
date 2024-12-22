@@ -5,7 +5,10 @@ description = "Add your description here"
 authors = [
     { name = "hjosugi", email = "h.jo.sugi@gmail.com" }
 ]
-dependencies = []
+dependencies = [
+    "flask>=3.1.0",
+    "requests>=2.32.3",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 

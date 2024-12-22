@@ -1,14 +1,5 @@
 from abc import ABCMeta, abstractmethod
-
-
-class User:
-    def __init__(self, id: int, name: str, email: str):
-        self.id = id
-        self.name = name
-        self.email = email
-
-    def __getitem__(self, key):
-        return getattr(self, key)
+import requests
 
 
 class UserRepository(metaclass=ABCMeta):
@@ -18,14 +9,23 @@ class UserRepository(metaclass=ABCMeta):
 
 
 class DBUserRepository(UserRepository):
+    def __init__(self, db_con):
+        self.db_con = db_con
+
     def get_user_by_id(self, user_id):
-        user = User(user_id, "John Doe", "")
+        cur = self.db_con.cursor()
+        cur.execute("SELECT * FROM users WHERE id=?", (user_id,))
+        user = cur.fetchone()
         return user
 
 
 class APIUserRepository(UserRepository):
-    def get_user_by_id(self, user_id) -> User:
-        user = User(user_id, "John Doe", "")
+    def __init__(self, url):
+        self.url = url
+
+    def get_user_by_id(self, user_id):
+        res = requests.get(f"{self.url}/user/{user_id}")
+        user = res.json()
         return user
 
 
@@ -39,9 +39,9 @@ class Service:
 
 
 def main():
-    user_repository = APIUserRepository()
+    user_repository = APIUserRepository("http://127.0.0.1:5000")
     service = Service(user_repository)
-    service.display_user(1)
+    service.display_user(2)
 
 
 main()
